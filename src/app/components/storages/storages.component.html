@@ -1,0 +1,136 @@
+<div style="margin: 0px;" class="d-flex justify-content-evenly">
+    <div *ngFor="let storage of storages">
+        <div class="border border-secondary rounded mr-2">
+          <h3>{{ storage.name }}</h3>
+          <p-table [value]="storage.aisles" [tableStyle]="{ 'min-width': '50rem' }">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Reyon</th>
+                <th>Tür</th>
+                <th>Ürünler</th>
+                <th>
+                  <button type="button" (click)="openAisleDialog(storage.name)" class="btn btn-primary btn-sm">Reyon Ekle</button>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-aisle>
+              <tr>
+                <td>{{ aisle.code }}</td>
+                <td>{{ aisle.category.name }}</td>
+                <td>
+                    <div *ngIf="aisle.products.length === 0">
+                      Ürün bulunmamaktadır
+                    </div>
+                    <ul *ngIf="aisle.products.length > 0">
+                      <li *ngFor="let product of aisle.products" style="list-style-type: none;display: inline-block; margin-right: 2px;">
+                        <button class="btn btn-primary btn-sm" (click)="openProductDetailDialog(product.id)">{{product.name}}</button>
+                    </li>
+
+                    </ul>
+                  </td>
+                <td><button type="button"  (click)="openProductDialog(aisle.code, storage.name)"  class="btn btn-primary btn-sm">Ürün Ekle</button></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+      
+      <div>
+        <p-dialog header="Reyon Ekleme" [modal]="true" [(visible)]="aisle" [style]="{ width: '25rem' }">
+            <form [formGroup]="aisleForm" (ngSubmit)="addAisle()">
+              <label for="aisleName" class="font-semibold w-6rem">Reyon Adı</label>
+              <div class="flex align-items-center gap-3 mb-3">
+                <input pInputText id="aisleName" formControlName="aisleName" class="flex-auto" readonly />
+              </div>
+        
+              <label for="aisleType" class="font-semibold w-6rem">Reyon Türü</label>
+              <div class="flex align-items-center gap-3 mb-5">
+                <p-dropdown [options]="categories" formControlName="selectedCategory" [checkmark]="true" optionLabel="name"
+                            [showClear]="true" placeholder="Reyon Türü Seçiniz"></p-dropdown>
+              </div>
+        
+              <label for="warehouse" class="font-semibold w-6rem">Eklenecek Depo</label>
+              <div class="flex align-items-center gap-3 mb-3">
+                <input pInputText id="warehouse" formControlName="warehouse" class="flex-auto" readonly />
+              </div>
+        
+              <div class="flex justify-content-end gap-2">
+                  <p-button label="Kapat" severity="secondary" (onClick)="aisle = false"></p-button>
+                  <button pButton pRipple type="submit" label="Kaydet" class="p-button-outlined p-button-success"></button>
+                </div>
+            </form>
+        </p-dialog>
+      </div>
+
+    
+      <div>
+
+        
+    <p-dialog header="Ürün Ekleme" [modal]="true" [(visible)]="product" [style]="{ width: '25rem' }">
+        <form [formGroup]="productForm" (ngSubmit)="addProduct()">
+          
+          <label for="productId" class="font-semibold w-6rem">Ürün ID</label>
+          <div class="flex align-items-center gap-3 mb-3">
+            <input pInputText id="productId" formControlName="productId" class="flex-auto" />
+          </div>
+          
+          <label for="productName" class="font-semibold w-6rem">Ürün Adı</label>
+          <div class="flex align-items-center gap-3 mb-3">
+            <input pInputText id="productName" formControlName="productName" class="flex-auto" />
+          </div>
+      
+          <label for="aisle" class="font-semibold w-6rem">Eklenecek Reyon</label>
+          <div class="flex align-items-center gap-3 mb-3">
+            <input pInputText id="aisle" [value]="selectedAisle" class="flex-auto" readonly />
+          </div>
+      
+          <div class="flex justify-content-end gap-2">
+            <p-button label="Kapat"   (onClick)="product = false"></p-button>
+            <button pButton pRipple type="submit" label="Kaydet" class="p-button-outlined p-button-success"></button>
+
+        </div>
+          
+        </form>
+      </p-dialog>
+      </div>
+
+      
+      <div>
+        <p-dialog header="Ürün Ekleme" [modal]="true" [(visible)]="productDetail" [style]="{ width: '25rem' }">
+            <form [formGroup]="productForm" (ngSubmit)="updateProduct()">
+              
+              <label for="productId" class="font-semibold w-6rem">Ürün ID</label>
+              <div class="flex align-items-center gap-3 mb-3">
+                <input pInputText id="productId" formControlName="productId" class="flex-auto" readonly />
+              </div>
+              
+              <label for="productName" class="font-semibold w-6rem">Ürün Adı</label>
+              <div class="flex align-items-center gap-3 mb-3">
+                <input pInputText id="productName" formControlName="productName" class="flex-auto" />
+              </div>
+          
+              <label for="aisleType" class="font-semibold w-6rem">Bulunduğu Reyon Türü</label>
+              <div class="flex align-items-center gap-3 mb-5">
+                <p-dropdown [options]="categories" formControlName="selectedCategory" [checkmark]="true" optionLabel="name"
+                            [showClear]="true" [disabled]="true"></p-dropdown>
+              </div>
+        
+              <label for="aisleType" class="font-semibold w-6rem">Taşınacak Depoyu Seçiniz</label>
+              <div class="flex align-items-center gap-3 mb-5">
+                <p-dropdown [options]="storages" formControlName="selectedWarehouse" [checkmark]="true" optionLabel="name"
+                            [showClear]="true" placeholder="Depo Seçiniz"></p-dropdown>
+              </div>
+        
+              <div class="flex justify-content-end gap-2">
+                <p-button label="Ürünü Sil" severity="secondary" (onClick)="deleteProduct(selectedProduct?.id)"></p-button>
+                <button pButton pRipple type="submit" label="Kaydet" class="p-button-outlined p-button-success"></button>
+
+              </div>
+              
+            </form>
+          </p-dialog>
+      </div>
+          
+
+  </div>
+  
